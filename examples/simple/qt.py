@@ -1,6 +1,6 @@
+import argparse
 import json
 import sys
-import argparse
 
 import torch
 import torchvision.transforms as transforms
@@ -9,7 +9,6 @@ from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtWidgets import *
 
 from googlenet_pytorch import GoogLeNet
-
 
 parser = argparse.ArgumentParser("GoogLeNet Classifier Tool")
 parser.add_argument("-a", "--arch", type=str, default='GoogLeNet',

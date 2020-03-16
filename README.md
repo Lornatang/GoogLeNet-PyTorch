@@ -58,14 +58,14 @@ of which is assessed in the context of classification and detection.
 
 Install from pypi:
 ```bash
-pip install googlenet_pytorch
+$ pip install googlenet_pytorch
 ```
 
 Install from source:
 ```bash
-git clone https://github.com/Lornatang/GoogLeNet-PyTorch.git
-cd GoogLeNet-PyTorch
-pip install -e .
+$ git clone https://github.com/Lornatang/GoogLeNet-PyTorch.git
+$ cd GoogLeNet-PyTorch
+$ pip install -e .
 ``` 
 
 ### Usage
@@ -192,3 +192,32 @@ For more datasets result. Please see `research/README.md`.
 If you find a bug, create a GitHub issue, or even better, submit a pull request. Similarly, if you have questions, simply post them as GitHub issues.   
 
 I look forward to seeing what the community does with these models! 
+
+### Credit
+
+#### Going Deeper with Convolutions
+
+*Christian Szegedy1, Wei Liu2, Yangqing Jia1, Pierre Sermanet1, Scott Reed3, Dragomir Anguelov1, Dumitru Erhan1, Vincent Vanhoucke1, Andrew Rabinovich4*
+
+##### Abstract
+
+We propose a deep convolutional neural network architecture codenamed Inception that achieves the new
+state of the art for classification and detection in the ImageNet Large-Scale Visual Recognition Challenge 2014
+(ILSVRC14). The main hallmark of this architecture is the
+improved utilization of the computing resources inside the
+network. By a carefully crafted design, we increased the
+depth and width of the network while keeping the computational budget constant. To optimize quality, the architectural decisions were based on the Hebbian principle and
+the intuition of multi-scale processing. One particular incarnation used in our submission for ILSVRC14 is called
+GoogLeNet, a 22 layers deep network, the quality of which
+is assessed in the context of classification and detection.
+
+[paper](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/43022.pdf)
+
+```text
+@article{AlexNet,
+title:{Going Deeper with Convolutions},
+author:{Christian Szegedy1, Wei Liu2, Yangqing Jia1, Pierre Sermanet1, Scott Reed3, Dragomir Anguelov1, Dumitru Erhan1, Vincent Vanhoucke1, Andrew Rabinovich4},
+journal={cvpr},
+year={2015}
+}
+```

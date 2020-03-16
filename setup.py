@@ -17,8 +17,8 @@ DESCRIPTION = 'Restore the official code 100% and improve it to make it easier t
 URL = 'https://github.com/Lornatang/GoogLeNet-PyTorch'
 EMAIL = 'liuchangyu1111@gmail.com'
 AUTHOR = 'Liu Changyu'
-REQUIRES_PYTHON = '>=3.5.0'
-VERSION = '0.2.0'
+REQUIRES_PYTHON = '>=3.6.0'
+VERSION = '0.3.0'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
@@ -121,6 +121,7 @@ setup(
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
     ],
     # $ setup.py publish support.

@@ -1,223 +1,153 @@
-# GoogLeNet-PyTorch
+# VGG-PyTorch
 
-### Update (Feb 17, 2020)
+<a href="https://console.tiyaro.ai/explore/trn:model:123456789012-venkat:1.0:alexnet_pytorch_6c50c5">
+<img src="https://tiyaro-public-docs.s3.us-west-2.amazonaws.com/assets/tiyaro_badge.svg"></a>
 
-The update is for ease of use and deployment.
+## Overview
 
- * [Example: Export to ONNX](#example-export-to-onnx)
- * [Example: Extract features](#example-feature-extraction)
- * [Example: Visual](#example-visual)
+This repository contains an op-for-op PyTorch reimplementation
+of [Very Deep Convolutional Networks for Large-Scale Image Recognition](https://arxiv.org/pdf/1409.1556v6.pdf).
 
-It is also now incredibly simple to load a pretrained model with a new number of classes for transfer learning:
+## Table of contents
 
-```python
-from googlenet_pytorch import GoogLeNet 
-model = GoogLeNet.from_pretrained('googlenet')
-```
+- [VGG-PyTorch](#vgg-pytorch)
+    - [Overview](#overview)
+    - [Table of contents](#table-of-contents)
+    - [Download weights](#download-weights)
+    - [Download datasets](#download-datasets)
+    - [How Test and Train](#how-test-and-train)
+        - [Test](#test)
+        - [Train model](#train-model)
+        - [Resume train model](#resume-train-model)
+    - [Result](#result)
+    - [Contributing](#contributing)
+    - [Credit](#credit)
+        - [Very Deep Convolutional Networks for Large-Scale Image Recognition](#very-deep-convolutional-networks-for-large-scale-image-recognition)
 
-### Overview
-This repository contains an op-for-op PyTorch reimplementation of [Going Deeper with Convolutions](https://arxiv.org/pdf/1409.4842.pdf).
+## Download weights
 
-The goal of this implementation is to be simple, highly extensible, and easy to integrate into your own projects. This implementation is a work in progress -- new features are currently being implemented.  
+- [Google Driver](https://drive.google.com/drive/folders/17ju2HN7Y6pyPK2CC_AqnAfTOe9_3hCQ8?usp=sharing)
+- [Baidu Driver](https://pan.baidu.com/s/1yNs4rqIb004-NKEdKBJtYg?pwd=llot)
 
-At the moment, you can easily:  
- * Load pretrained GoogLeNet models 
- * Use VGGNet models for classification or feature extraction 
+## Download datasets
 
-_Upcoming features_: In the next few days, you will be able to:
- * Quickly finetune an GoogLeNet on your own dataset
- * Export GoogLeNet models for production
- 
-### Table of contents
-1. [About GoogLeNet](#about-googlenet)
-2. [Installation](#installation)
-3. [Usage](#usage)
-    * [Load pretrained models](#loading-pretrained-models)
-    * [Example: Classify](#example-classification)
-    * [Example: Extract features](#example-feature-extraction)
-    * [Example: Export to ONNX](#example-export-to-onnx)
-    * [Example: Visual](#example-visual)
-4. [Contributing](#contributing) 
+Contains MNIST, CIFAR10&CIFAR100, TinyImageNet_200, MiniImageNet_1K, ImageNet_1K, Caltech101&Caltech256 and more etc.
 
-### About GoogLeNet
+- [Google Driver](https://drive.google.com/drive/folders/1f-NSpZc07Qlzhgi6EbBEI1wTkN1MxPbQ?usp=sharing)
+- [Baidu Driver](https://pan.baidu.com/s/1arNM38vhDT7p4jKeD4sqwA?pwd=llot)
 
-If you're new to GoogLeNet, here is an explanation straight from the official PyTorch implementation: 
+Please refer to `README.md` in the `data` directory for the method of making a dataset.
 
-We propose a deep convolutional neural network architecture codenamed "Inception", 
-which was responsible for setting the new state of the art for classification and 
-detection in the ImageNet Large-Scale Visual Recognition Challenge 2014 (ILSVRC 2014). 
-The main hallmark of this architecture is the improved utilization of the computing 
-resources inside the network. This was achieved by a carefully crafted design that allows 
-for increasing the depth and width of the network while keeping the computational budget 
-constant. To optimize quality, the architectural decisions were based on the Hebbian 
-principle and the intuition of multi-scale processing. One particular incarnation used 
-in our submission for ILSVRC 2014 is called GoogLeNet, a 22 layers deep network, the quality 
-of which is assessed in the context of classification and detection.
+## How Test and Train
 
-### Installation
+Both training and testing only need to modify the `config.py` file.
 
-Install from pypi:
+### Test
+
+- line 29: `model_arch_name` change to `vgg11`.
+- line 31: `model_num_classes` change to `1000`.
+- line 33: `mode` change to `test`.
+- line 81: `model_weights_path` change to `./results/pretrained_models/VGG11-ImageNet_1K-64f6524f.pth.tar`.
+
 ```bash
-$ pip install googlenet_pytorch
+python3 test.py
 ```
 
-Install from source:
+### Train model
+
+- line 29: `model_arch_name` change to `vgg11`.
+- line 31: `model_num_classes` change to `1000`.
+- line 33: `mode` change to `train`.
+- line 47: `pretrained_model_weights_path` change to `./results/pretrained_models/VGG11-ImageNet_1K-64f6524f.pth.tar`.
+
 ```bash
-$ git clone https://github.com/Lornatang/GoogLeNet-PyTorch.git
-$ cd GoogLeNet-PyTorch
-$ pip install -e .
-``` 
-
-### Usage
-
-#### Loading pretrained models
-
-Load a pretrained GoogLeNet: 
-```python
-from googlenet_pytorch import GoogLeNet
-model = GoogLeNet.from_pretrained("googlenet")
+python3 train.py
 ```
 
-Their 1-crop error rates on imagenet dataset with pretrained models are listed below.
+### Resume train model
 
-| Model structure | Top-1 error | Top-5 error |
-| --------------- | ----------- | ----------- |
-|  googlenet	  |  30.22	    |  10.47      |
+- line 29: `model_arch_name` change to `vgg11`.
+- line 31: `model_num_classes` change to `1000`.
+- line 33: `mode` change to `train`.
+- line 50: `resume` change to `./samples/VGG11-ImageNet_1K/epoch_xxx.pth.tar`.
 
-#### Example: Classification
-
-We assume that in your current directory, there is a `img.jpg` file and a `labels_map.txt` file (ImageNet class names). These are both included in `examples/simple`. 
-
-All pre-trained models expect input images normalized in the same way,
-i.e. mini-batches of 3-channel RGB images of shape `(3 x H x W)`, where `H` and `W` are expected to be at least `224`.
-The images have to be loaded in to a range of `[0, 1]` and then normalized using `mean = [0.485, 0.456, 0.406]`
-and `std = [0.229, 0.224, 0.225]`.
-
-Here's a sample execution.
-
-```python
-import json
-
-import torch
-import torchvision.transforms as transforms
-from PIL import Image
-
-from googlenet_pytorch import GoogLeNet 
-
-# Open image
-input_image = Image.open("img.jpg")
-
-# Preprocess image
-preprocess = transforms.Compose([
-  transforms.Resize(256),
-  transforms.CenterCrop(224),
-  transforms.ToTensor(),
-  transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-])
-input_tensor = preprocess(input_image)
-input_batch = input_tensor.unsqueeze(0)  # create a mini-batch as expected by the model
-
-# Load class names
-labels_map = json.load(open("labels_map.txt"))
-labels_map = [labels_map[str(i)] for i in range(1000)]
-
-# Classify with GoogLeNet
-model = GoogLeNet.from_pretrained("googlenet")
-model.eval()
-
-# move the input and model to GPU for speed if available
-if torch.cuda.is_available():
-  input_batch = input_batch.to("cuda")
-  model.to("cuda")
-
-with torch.no_grad():
-  logits = model(input_batch)
-preds = torch.topk(logits, k=5).indices.squeeze(0).tolist()
-
-print("-----")
-for idx in preds:
-  label = labels_map[idx]
-  prob = torch.softmax(logits, dim=1)[0, idx].item()
-  print(f"{label:<75} ({prob * 100:.2f}%)")
+```bash
+python3 train.py
 ```
 
-#### Example: Feature Extraction 
+## Result
 
-You can easily extract features with `model.extract_features`:
-```python
-import torch
-from googlenet_pytorch import GoogLeNet 
-model = GoogLeNet.from_pretrained('googlenet')
+Source of original paper results: [https://arxiv.org/pdf/1409.1556v6.pdf](https://arxiv.org/pdf/1409.1556v6.pdf))
 
-# ... image preprocessing as in the classification example ...
-inputs = torch.randn(1, 3, 224, 224)
-print(inputs.shape) # torch.Size([1, 3, 224, 224])
+In the following table, the top-x error value in `()` indicates the result of the project, and `-` indicates no test.
 
-features = model.extract_features(inputs)
-print(features.shape) # torch.Size([1, 1024, 7, 7])
+|  Model   |   Dataset   | Top-1 error (val) | Top-5 error (val) |
+|:--------:|:-----------:|:-----------------:|:-----------------:|
+|  VGG11   | ImageNet_1K | 29.6%(**30.9%**)  | 10.4%(**11.3%**)  |
+| VGG11_BN | ImageNet_1K |   -(**29.6%**)    |   -(**10.2%**)    |
+|  VGG13   | ImageNet_1K | 28.7%(**30.1%**)  |  9.9%(**10.8%**)  |
+| VGG13_BN | ImageNet_1K |   -(**28.4%**)    |    -(**9.6%**)    |
+|  VGG16   | ImageNet_1K | 27.0%(**28.4%**)  |  8.8%(**9.6%**)   |
+| VGG16_BN | ImageNet_1K |   -(**26.6%**)    |    -(**8.5%**)    |
+|  VGG19   | ImageNet_1K | 27.3%(**27.6%**)  |  9.0%(**9.1%**)   |
+| VGG19_BN | ImageNet_1K |   -(**25.7%**)    |    -(**8.1%**)    |
+
+```bash
+# Download `VGG11-ImageNet_1K-64f6524f.pth.tar` weights to `./results/pretrained_models`
+# More detail see `README.md<Download weights>`
+python3 ./inference.py 
 ```
 
-#### Example: Export to ONNX  
+Input:
 
-Exporting to ONNX for deploying to production is now simple: 
-```python
-import torch 
-from googlenet_pytorch import GoogLeNet 
+<span align="center"><img width="224" height="224" src="figure/n01440764_36.JPEG"/></span>
 
-model = GoogLeNet.from_pretrained('googlenet')
-dummy_input = torch.randn(16, 3, 224, 224)
-
-torch.onnx.export(model, dummy_input, "demo.onnx", verbose=True)
-```
-
-#### Example: Visual
+Output:
 
 ```text
-cd $REPO$/framework
-sh start.sh
+Build VGG11 model successfully.
+Load VGG11 model weights `/VGG-PyTorch/results/pretrained_models/VGG11-ImageNet_1K-64f6524f.pth.tar` successfully.
+tench, Tinca tinca                                                          (74.97%)
+barracouta, snoek                                                           (23.09%)
+gar, garfish, garpike, billfish, Lepisosteus osseus                         (0.81%)
+reel                                                                        (0.45%)
+armadillo                                                                   (0.25%)
 ```
 
-Then open the browser and type in the browser address [http://127.0.0.1:10002/](http://127.0.0.1:10002/).
+## Contributing
 
-Enjoy it.
+If you find a bug, create a GitHub issue, or even better, submit a pull request. Similarly, if you have questions,
+simply post them as GitHub issues.
 
-#### ImageNet
-
-See `examples/imagenet` for details about evaluating on ImageNet.
-
-For more datasets result. Please see `research/README.md`.
-
-### Contributing
-
-If you find a bug, create a GitHub issue, or even better, submit a pull request. Similarly, if you have questions, simply post them as GitHub issues.   
-
-I look forward to seeing what the community does with these models! 
+I look forward to seeing what the community does with these models!
 
 ### Credit
 
-#### Going Deeper with Convolutions
+#### Very Deep Convolutional Networks for Large-Scale Image Recognition
 
-*Christian Szegedy1, Wei Liu2, Yangqing Jia1, Pierre Sermanet1, Scott Reed3, Dragomir Anguelov1, Dumitru Erhan1, Vincent Vanhoucke1, Andrew Rabinovich4*
+*Karen Simonyan, Andrew Zisserman*
 
 ##### Abstract
 
-We propose a deep convolutional neural network architecture codenamed Inception that achieves the new
-state of the art for classification and detection in the ImageNet Large-Scale Visual Recognition Challenge 2014
-(ILSVRC14). The main hallmark of this architecture is the
-improved utilization of the computing resources inside the
-network. By a carefully crafted design, we increased the
-depth and width of the network while keeping the computational budget constant. To optimize quality, the architectural decisions were based on the Hebbian principle and
-the intuition of multi-scale processing. One particular incarnation used in our submission for ILSVRC14 is called
-GoogLeNet, a 22 layers deep network, the quality of which
-is assessed in the context of classification and detection.
+In this work we investigate the effect of the convolutional network depth on its
+accuracy in the large-scale image recognition setting. Our main contribution is
+a thorough evaluation of networks of increasing depth using an architecture with
+very small (3×3) convolution filters, which shows that a significant improvement
+on the prior-art configurations can be achieved by pushing the depth to 16–19
+weight layers. These findings were the basis of our ImageNet Challenge 2014
+submission, where our team secured the first and the second places in the localisation and classification tracks
+respectively. We also show that our representations
+generalise well to other datasets, where they achieve state-of-the-art results. We
+have made our two best-performing ConvNet models publicly available to facilitate further research on the use of deep
+visual representations in computer vision.
 
-[paper](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/43022.pdf)
+[[Paper]](https://arxiv.org/pdf/1409.1556v6.pdf)
 
-```text
-@article{AlexNet,
-title:{Going Deeper with Convolutions},
-author:{Christian Szegedy1, Wei Liu2, Yangqing Jia1, Pierre Sermanet1, Scott Reed3, Dragomir Anguelov1, Dumitru Erhan1, Vincent Vanhoucke1, Andrew Rabinovich4},
-journal={cvpr},
-year={2015}
+```bibtex
+@article{simonyan2014very,
+  title={Very deep convolutional networks for large-scale image recognition},
+  author={Simonyan, Karen and Zisserman, Andrew},
+  journal={arXiv preprint arXiv:1409.1556},
+  year={2014}
 }
 ```

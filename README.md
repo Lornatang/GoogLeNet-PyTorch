@@ -95,7 +95,7 @@ Output:
 
 ```text
 Build `googlenet` model successfully.
-Load `googlenet` model weights `/VGG-PyTorch/results/pretrained_models/GoogleNet-ImageNet_1K-32d70693.pth.tar` successfully.
+Load `googlenet` model weights `/GoogleNet-PyTorch/results/pretrained_models/GoogleNet-ImageNet_1K-32d70693.pth.tar` successfully.
 tench, Tinca tinca                                                          (90.46%)
 armadillo                                                                   (2.23%)
 barracouta, snoek                                                           (0.70%)

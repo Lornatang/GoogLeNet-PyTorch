@@ -1,16 +1,12 @@
-# VGG-PyTorch
-
-<a href="https://console.tiyaro.ai/explore/trn:model:123456789012-venkat:1.0:alexnet_pytorch_6c50c5">
-<img src="https://tiyaro-public-docs.s3.us-west-2.amazonaws.com/assets/tiyaro_badge.svg"></a>
+# GoogleNet-PyTorch
 
 ## Overview
 
-This repository contains an op-for-op PyTorch reimplementation
-of [Very Deep Convolutional Networks for Large-Scale Image Recognition](https://arxiv.org/pdf/1409.1556v6.pdf).
+This repository contains an op-for-op PyTorch reimplementation of [Going Deeper with Convolutions](https://arxiv.org/pdf/1409.4842v1.pdf).
 
 ## Table of contents
 
-- [VGG-PyTorch](#vgg-pytorch)
+- [GoogleNet-PyTorch](#googlenet-pytorch)
     - [Overview](#overview)
     - [Table of contents](#table-of-contents)
     - [Download weights](#download-weights)
@@ -22,7 +18,7 @@ of [Very Deep Convolutional Networks for Large-Scale Image Recognition](https://
     - [Result](#result)
     - [Contributing](#contributing)
     - [Credit](#credit)
-        - [Very Deep Convolutional Networks for Large-Scale Image Recognition](#very-deep-convolutional-networks-for-large-scale-image-recognition)
+        - [Going Deeper with Convolutions](#going-deeper-with-convolutions)
 
 ## Download weights
 
@@ -44,10 +40,10 @@ Both training and testing only need to modify the `config.py` file.
 
 ### Test
 
-- line 29: `model_arch_name` change to `vgg11`.
+- line 29: `model_arch_name` change to `googlenet`.
 - line 31: `model_num_classes` change to `1000`.
 - line 33: `mode` change to `test`.
-- line 81: `model_weights_path` change to `./results/pretrained_models/VGG11-ImageNet_1K-64f6524f.pth.tar`.
+- line 88: `model_weights_path` change to `./results/pretrained_models/GOOGLENET-ImageNet_1K-64f6524f.pth.tar`.
 
 ```bash
 python3 test.py
@@ -55,10 +51,10 @@ python3 test.py
 
 ### Train model
 
-- line 29: `model_arch_name` change to `vgg11`.
+- line 29: `model_arch_name` change to `googlenet`.
 - line 31: `model_num_classes` change to `1000`.
 - line 33: `mode` change to `train`.
-- line 47: `pretrained_model_weights_path` change to `./results/pretrained_models/VGG11-ImageNet_1K-64f6524f.pth.tar`.
+- line 47: `pretrained_model_weights_path` change to `./results/pretrained_models/GoogleNet-ImageNet_1K-32d70693.pth.tar`.
 
 ```bash
 python3 train.py
@@ -66,10 +62,10 @@ python3 train.py
 
 ### Resume train model
 
-- line 29: `model_arch_name` change to `vgg11`.
+- line 29: `model_arch_name` change to `googlenet`.
 - line 31: `model_num_classes` change to `1000`.
 - line 33: `mode` change to `train`.
-- line 50: `resume` change to `./samples/VGG11-ImageNet_1K/epoch_xxx.pth.tar`.
+- line 50: `resume` change to `./samples/GOOGLENET-ImageNet_1K/epoch_xxx.pth.tar`.
 
 ```bash
 python3 train.py
@@ -77,23 +73,16 @@ python3 train.py
 
 ## Result
 
-Source of original paper results: [https://arxiv.org/pdf/1409.1556v6.pdf](https://arxiv.org/pdf/1409.1556v6.pdf))
+Source of original paper results: [https://arxiv.org/pdf/1409.4842v1.pdf](https://arxiv.org/pdf/1409.4842v1.pdf))
 
 In the following table, the top-x error value in `()` indicates the result of the project, and `-` indicates no test.
 
-|  Model   |   Dataset   | Top-1 error (val) | Top-5 error (val) |
-|:--------:|:-----------:|:-----------------:|:-----------------:|
-|  VGG11   | ImageNet_1K | 29.6%(**30.9%**)  | 10.4%(**11.3%**)  |
-| VGG11_BN | ImageNet_1K |   -(**29.6%**)    |   -(**10.2%**)    |
-|  VGG13   | ImageNet_1K | 28.7%(**30.1%**)  |  9.9%(**10.8%**)  |
-| VGG13_BN | ImageNet_1K |   -(**28.4%**)    |    -(**9.6%**)    |
-|  VGG16   | ImageNet_1K | 27.0%(**28.4%**)  |  8.8%(**9.6%**)   |
-| VGG16_BN | ImageNet_1K |   -(**26.6%**)    |    -(**8.5%**)    |
-|  VGG19   | ImageNet_1K | 27.3%(**27.6%**)  |  9.0%(**9.1%**)   |
-| VGG19_BN | ImageNet_1K |   -(**25.7%**)    |    -(**8.1%**)    |
+|   Model   |   Dataset   | Top-1 error (val) | Top-5 error (val) |
+|:---------:|:-----------:|:-----------------:|:-----------------:|
+| GoogleNet | ImageNet_1K |   -(**30.2%**)    | 6.67%(**10.45%**) |
 
 ```bash
-# Download `VGG11-ImageNet_1K-64f6524f.pth.tar` weights to `./results/pretrained_models`
+# Download `GoogleNet-ImageNet_1K-32d70693.pth.tar` weights to `./results/pretrained_models`
 # More detail see `README.md<Download weights>`
 python3 ./inference.py 
 ```
@@ -105,13 +94,13 @@ Input:
 Output:
 
 ```text
-Build VGG11 model successfully.
-Load VGG11 model weights `/VGG-PyTorch/results/pretrained_models/VGG11-ImageNet_1K-64f6524f.pth.tar` successfully.
-tench, Tinca tinca                                                          (74.97%)
-barracouta, snoek                                                           (23.09%)
-gar, garfish, garpike, billfish, Lepisosteus osseus                         (0.81%)
-reel                                                                        (0.45%)
-armadillo                                                                   (0.25%)
+Build `googlenet` model successfully.
+Load `googlenet` model weights `/VGG-PyTorch/results/pretrained_models/GoogleNet-ImageNet_1K-32d70693.pth.tar` successfully.
+tench, Tinca tinca                                                          (90.46%)
+armadillo                                                                   (2.23%)
+barracouta, snoek                                                           (0.70%)
+platypus, duckbill, duckbilled platypus, duck-billed platypus, Ornithorhynchus anatinus (0.26%)
+mud turtle                                                                  (0.17%)
 ```
 
 ## Contributing
@@ -123,31 +112,30 @@ I look forward to seeing what the community does with these models!
 
 ### Credit
 
-#### Very Deep Convolutional Networks for Large-Scale Image Recognition
+#### Going Deeper with Convolutions
 
-*Karen Simonyan, Andrew Zisserman*
+*Christian Szegedy, Wei Liu, Yangqing Jia, Pierre Sermanet, Scott Reed, Dragomir Anguelov, Dumitru Erhan, Vincent
+Vanhoucke, Andrew Rabinovich*
 
 ##### Abstract
 
-In this work we investigate the effect of the convolutional network depth on its
-accuracy in the large-scale image recognition setting. Our main contribution is
-a thorough evaluation of networks of increasing depth using an architecture with
-very small (3×3) convolution filters, which shows that a significant improvement
-on the prior-art configurations can be achieved by pushing the depth to 16–19
-weight layers. These findings were the basis of our ImageNet Challenge 2014
-submission, where our team secured the first and the second places in the localisation and classification tracks
-respectively. We also show that our representations
-generalise well to other datasets, where they achieve state-of-the-art results. We
-have made our two best-performing ConvNet models publicly available to facilitate further research on the use of deep
-visual representations in computer vision.
+We propose a deep convolutional neural network architecture codenamed "Inception", which was responsible for setting the
+new state of the art for classification and detection in the ImageNet Large-Scale Visual Recognition Challenge 2014 (
+ILSVRC 2014). The main hallmark of this architecture is the improved utilization of the computing resources inside the
+network. This was achieved by a carefully crafted design that allows for increasing the depth and width of the network
+while keeping the computational budget constant. To optimize quality, the architectural decisions were based on the
+Hebbian principle and the intuition of multiscale processing. One particular incarnation used in our submission for
+ILSVRC 2014 is called GoogLeNet, a 22 layers deep network, the quality of which is assessed in the context of
+classification and detection.
 
-[[Paper]](https://arxiv.org/pdf/1409.1556v6.pdf)
+[[Paper]](https://arxiv.org/pdf/1409.4842v1.pdf)
 
 ```bibtex
-@article{simonyan2014very,
-  title={Very deep convolutional networks for large-scale image recognition},
-  author={Simonyan, Karen and Zisserman, Andrew},
-  journal={arXiv preprint arXiv:1409.1556},
-  year={2014}
+@inproceedings{szegedy2015going,
+  title={Going deeper with convolutions},
+  author={Szegedy, Christian and Liu, Wei and Jia, Yangqing and Sermanet, Pierre and Reed, Scott and Anguelov, Dragomir and Erhan, Dumitru and Vanhoucke, Vincent and Rabinovich, Andrew},
+  booktitle={Proceedings of the IEEE conference on computer vision and pattern recognition},
+  pages={1--9},
+  year={2015}
 }
 ```

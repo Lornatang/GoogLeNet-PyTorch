@@ -27,10 +27,12 @@ model_names = sorted(
 
 
 def build_model() -> nn.Module:
-    vgg_model = model.__dict__[config.model_arch_name](num_classes=config.model_num_classes)
-    vgg_model = vgg_model.to(device=config.device, memory_format=torch.channels_last)
+    googlenet_model = model.__dict__[config.model_arch_name](num_classes=config.model_num_classes,
+                                                             aux_logits=False,
+                                                             transform_input=True)
+    googlenet_model = googlenet_model.to(device=config.device, memory_format=torch.channels_last)
 
-    return vgg_model
+    return googlenet_model
 
 
 def load_dataset() -> CUDAPrefetcher:
@@ -51,16 +53,16 @@ def load_dataset() -> CUDAPrefetcher:
 
 def main() -> None:
     # Initialize the model
-    vgg_model = build_model()
-    print(f"Build {config.model_arch_name.upper()} model successfully.")
+    googlenet_model = build_model()
+    print(f"Build `{config.model_arch_name}` model successfully.")
 
     # Load model weights
-    vgg_model, _, _, _, _, _ = load_state_dict(vgg_model, config.model_weights_path)
-    print(f"Load {config.model_arch_name.upper()} model "
-          f"weights `{os.path.abspath(config.model_weights_path)}` successfully.")
+    googlenet_model, _, _, _, _, _ = load_state_dict(googlenet_model, config.model_weights_path)
+    print(f"Load `{config.model_arch_name}` "
+          f"model weights `{os.path.abspath(config.model_weights_path)}` successfully.")
 
     # Start the verification mode of the model.
-    vgg_model.eval()
+    googlenet_model.eval()
 
     # Load test dataloader
     test_prefetcher = load_dataset()
@@ -92,7 +94,7 @@ def main() -> None:
             batch_size = images.size(0)
 
             # Inference
-            output = vgg_model(images)
+            output = googlenet_model(images)
 
             # measure accuracy and record loss
             top1, top5 = accuracy(output, target, topk=(1, 5))

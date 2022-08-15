@@ -11,16 +11,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+import os
+import shutil
 from enum import Enum
+from typing import Any, Dict, TypeVar
 
 import torch
 from torch import nn
-import shutil
-import os
 
 __all__ = [
-    "accuracy", "load_state_dict", "make_directory", "save_checkpoint", "Summary", "AverageMeter", "ProgressMeter"
+    "accuracy", "load_state_dict", "make_directory", "ovewrite_named_param", "save_checkpoint",
+    "Summary", "AverageMeter", "ProgressMeter"
 ]
+
+V = TypeVar("V")
 
 
 def accuracy(output, target, topk=(1,)):
@@ -88,6 +92,14 @@ def load_state_dict(
 def make_directory(dir_path: str) -> None:
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
+
+
+def ovewrite_named_param(kwargs: Dict[str, Any], param: str, new_value: V) -> None:
+    if param in kwargs:
+        if kwargs[param] != new_value:
+            raise ValueError(f"The parameter '{param}' expected value {new_value} but got {kwargs[param]} instead.")
+    else:
+        kwargs[param] = new_value
 
 
 def save_checkpoint(

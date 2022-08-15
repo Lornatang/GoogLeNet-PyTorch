@@ -26,11 +26,11 @@ device = torch.device("cuda", 0)
 # Turning on when the image size does not change during training can speed up training
 cudnn.benchmark = True
 # Model arch name
-model_arch_name = "vgg19"
+model_arch_name = "googlenet"
 # Model number class
 model_num_classes = 1000
 # Current configuration parameter method
-mode = "test"
+mode = "train"
 # Experiment name, easy to save weights and log files
 exp_name = f"{model_arch_name.upper()}-ImageNet_1K"
 
@@ -44,7 +44,7 @@ if mode == "train":
     num_workers = 4
 
     # The address to load the pretrained model
-    pretrained_model_weights_path = "./results/pretrained_models/VGG11-ImageNet_1K.pth.tar"
+    pretrained_model_weights_path = "./results/pretrained_models/GoogleNet-ImageNet_1K-32d70693.pth.tar"
 
     # Incremental training and migration training
     resume = ""
@@ -54,6 +54,9 @@ if mode == "train":
 
     # Loss parameters
     loss_label_smoothing = 0.1
+    loss_aux3_weights = 1.0
+    loss_aux2_weights = 0.3
+    loss_aux1_weights = 0.3
 
     # Optimizer parameter
     model_lr = 0.1
@@ -82,4 +85,4 @@ if mode == "test":
     # How many iterations to print the testing result
     test_print_frequency = 20
 
-    model_weights_path = "./results/pretrained_models/VGG19-ImageNet_1K.pth.tar"
+    model_weights_path = "./results/pretrained_models/GoogleNet-ImageNet_1K-32d70693.pth.tar"

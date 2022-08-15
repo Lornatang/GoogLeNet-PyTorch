@@ -40,15 +40,15 @@ def main():
     best_acc1 = 0.0
 
     train_prefetcher, valid_prefetcher = load_dataset()
-    print(f"Load {config.model_arch_name.upper()} datasets successfully.")
+    print(f"Load `{config.model_arch_name}` datasets successfully.")
 
-    vgg_model, ema_vgg_model = build_model()
-    print(f"Build {config.model_arch_name.upper()} model successfully.")
+    googlenet_model, ema_googlenet_model = build_model()
+    print(f"Build `{config.model_arch_name}` model successfully.")
 
     pixel_criterion = define_loss()
     print("Define all loss functions successfully.")
 
-    optimizer = define_optimizer(vgg_model)
+    optimizer = define_optimizer(googlenet_model)
     print("Define all optimizer functions successfully.")
 
     scheduler = define_scheduler(optimizer)
@@ -56,27 +56,29 @@ def main():
 
     print("Check whether to load pretrained model weights...")
     if config.pretrained_model_weights_path:
-        vgg_model, ema_vgg_model, start_epoch, best_acc1, optimizer, scheduler = load_state_dict(vgg_model,
-                                                                                                 config.pretrained_model_weights_path,
-                                                                                                 ema_vgg_model,
-                                                                                                 start_epoch,
-                                                                                                 best_acc1,
-                                                                                                 optimizer,
-                                                                                                 scheduler)
+        googlenet_model, ema_googlenet_model, start_epoch, best_acc1, optimizer, scheduler = load_state_dict(
+            googlenet_model,
+            config.pretrained_model_weights_path,
+            ema_googlenet_model,
+            start_epoch,
+            best_acc1,
+            optimizer,
+            scheduler)
         print(f"Loaded `{config.pretrained_model_weights_path}` pretrained model weights successfully.")
     else:
         print("Pretrained model weights not found.")
 
     print("Check whether the pretrained model is restored...")
     if config.resume:
-        vgg_model, ema_vgg_model, start_epoch, best_acc1, optimizer, scheduler = load_state_dict(vgg_model,
-                                                                                                 config.pretrained_model_weights_path,
-                                                                                                 ema_vgg_model,
-                                                                                                 start_epoch,
-                                                                                                 best_acc1,
-                                                                                                 optimizer,
-                                                                                                 scheduler,
-                                                                                                 "resume")
+        googlenet_model, ema_googlenet_model, start_epoch, best_acc1, optimizer, scheduler = load_state_dict(
+            googlenet_model,
+            config.pretrained_model_weights_path,
+            ema_googlenet_model,
+            start_epoch,
+            best_acc1,
+            optimizer,
+            scheduler,
+            "resume")
         print("Loaded pretrained generator model weights.")
     else:
         print("Resume training model not found. Start training from scratch.")
@@ -94,8 +96,8 @@ def main():
     scaler = amp.GradScaler()
 
     for epoch in range(start_epoch, config.epochs):
-        train(vgg_model, ema_vgg_model, train_prefetcher, pixel_criterion, optimizer, epoch, scaler, writer)
-        acc1 = validate(ema_vgg_model, valid_prefetcher, epoch, writer, "Valid")
+        train(googlenet_model, ema_googlenet_model, train_prefetcher, pixel_criterion, optimizer, epoch, scaler, writer)
+        acc1 = validate(ema_googlenet_model, valid_prefetcher, epoch, writer, "Valid")
         print("\n")
 
         # Update LR
@@ -107,8 +109,8 @@ def main():
         best_acc1 = max(acc1, best_acc1)
         save_checkpoint({"epoch": epoch + 1,
                          "best_acc1": best_acc1,
-                         "state_dict": vgg_model.state_dict(),
-                         "ema_state_dict": ema_vgg_model.state_dict(),
+                         "state_dict": googlenet_model.state_dict(),
+                         "ema_state_dict": ema_googlenet_model.state_dict(),
                          "optimizer": optimizer.state_dict(),
                          "scheduler": scheduler.state_dict()},
                         f"epoch_{epoch + 1}.pth.tar",
@@ -147,13 +149,15 @@ def load_dataset() -> [CUDAPrefetcher, CUDAPrefetcher]:
 
 
 def build_model() -> [nn.Module, nn.Module]:
-    vgg_model = model.__dict__[config.model_arch_name](num_classes=config.model_num_classes)
-    vgg_model = vgg_model.to(device=config.device, memory_format=torch.channels_last)
+    googlenet_model = model.__dict__[config.model_arch_name](num_classes=config.model_num_classes,
+                                                             aux_logits=False,
+                                                             transform_input=True)
+    googlenet_model = googlenet_model.to(device=config.device, memory_format=torch.channels_last)
 
     ema_avg = lambda averaged_model_parameter, model_parameter, num_averaged: (1 - config.model_ema_decay) * averaged_model_parameter + config.model_ema_decay * model_parameter
-    ema_vgg_model = AveragedModel(vgg_model, avg_fn=ema_avg)
+    ema_googlenet_model = AveragedModel(googlenet_model, avg_fn=ema_avg)
 
-    return vgg_model, ema_vgg_model
+    return googlenet_model, ema_googlenet_model
 
 
 def define_loss() -> nn.CrossEntropyLoss:
@@ -232,8 +236,11 @@ def train(
 
         # Mixed precision training
         with amp.autocast():
-            output = model(images)
-            loss = criterion(output, target)
+            aux3, aux2, aux1 = model(images)
+            loss_aux3 = config.loss_aux3_weights * criterion(aux3, target)
+            loss_aux2 = config.loss_aux2_weights * criterion(aux2, target)
+            loss_aux1 = config.loss_aux1_weights * criterion(aux1, target)
+            loss = loss_aux3 + loss_aux2 + loss_aux1
 
         # Backpropagation
         scaler.scale(loss).backward()
@@ -245,10 +252,10 @@ def train(
         ema_model.update_parameters(model)
 
         # measure accuracy and record loss
-        top1, top5 = accuracy(output, target, topk=(1, 5))
+        top1, top5 = accuracy(aux3, target, topk=(1, 5))
         losses.update(loss.item(), batch_size)
-        acc1.update(top1[0], batch_size)
-        acc5.update(top5[0], batch_size)
+        acc1.update(top1[0].item(), batch_size)
+        acc5.update(top5[0].item(), batch_size)
 
         # Calculate the time it takes to fully train a batch of data
         batch_time.update(time.time() - end)
@@ -322,7 +329,7 @@ def validate(
             # Preload the next batch of data
             batch_data = data_prefetcher.next()
 
-            # After training a batch of data, add 1 to the number of data batches to ensure that the terminal prints data normally
+            # Add 1 to the number of data batches to ensure that the terminal prints data normally
             batch_index += 1
 
     # print metrics

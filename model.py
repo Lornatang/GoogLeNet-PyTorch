@@ -11,14 +11,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-from collections import namedtuple## undefined
-from typing import Optional, Tuple, Any## undefined
+from collections import namedtuple## import named tuple type; fields can be accessed by name instead of position index
+from typing import Optional, Tuple, Any## import optional(Optional[X]=X | None), tuple(of two items) and any(possible to perform any operation or method call on a value of type Any and assign it to any variable) type
 
-import torch## undefined
-from torch import Tensor## undefined
-from torch import nn## undefined
+import torch## import torch library
+from torch import Tensor## import vector data type from torch library
+from torch import nn## import neural network things such as various neural network layer types
 
-__all__ = [## undefined
+__all__ = [## define and initialize a list called __all__
     "GoogLeNetOutputs",
     "GoogLeNet",
     "BasicConv2d", "Inception", "InceptionAux",
@@ -26,23 +26,23 @@ __all__ = [## undefined
 ]
 
 # According to the writing of the official library of Torchvision
-GoogLeNetOutputs = namedtuple("GoogLeNetOutputs", ["logits", "aux_logits2", "aux_logits1"])## undefined
-GoogLeNetOutputs.__annotations__ = {"logits": Tensor, "aux_logits2": Optional[Tensor], "aux_logits1": Optional[Tensor]}## undefined
+GoogLeNetOutputs = namedtuple("GoogLeNetOutputs", ["logits", "aux_logits2", "aux_logits1"])## create a tuple called "GoogLeNetOutputs" with the same typename and field names:logits, aux_logits2, aux_logits1
+GoogLeNetOutputs.__annotations__ = {"logits": Tensor, "aux_logits2": Optional[Tensor], "aux_logits1": Optional[Tensor]}## dictionary variable that keeps pairs of (key,value)
 
 
-class GoogLeNet(nn.Module):## undefined
-    __constants__ = ["aux_logits", "transform_input"]## undefined
+class GoogLeNet(nn.Module):## define class GoogLeNet that subclasses the base class for all neural network modules
+    __constants__ = ["aux_logits", "transform_input"]## define a list
 
     def __init__(
             self,
-            num_classes: int = 1000,## undefined
-            aux_logits: bool = True,## undefined
-            transform_input: bool = False,## undefined
-            dropout: float = 0.2,## undefined
-            dropout_aux: float = 0.7,## undefined
+            num_classes: int = 1000,## define an int called num_classes that takes the value 1000
+            aux_logits: bool = True,## define a bool called aux_logits that takes the value True
+            transform_input: bool = False,## define a bool called transform_input that takes the value False
+            dropout: float = 0.2,## define a float called dropout that takes the value 0.2
+            dropout_aux: float = 0.7,## define a float called dropout_aux that takes the value 0.7
     ) -> None:
-        super(GoogLeNet, self).__init__()## undefined
-        self.aux_logits = aux_logits## undefined
+        super(GoogLeNet, self).__init__()## call the __init__ method of the superclass
+        self.aux_logits = aux_logits## 
         self.transform_input = transform_input## undefined
 
         self.conv1 = BasicConv2d(3, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3))## undefined

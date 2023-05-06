@@ -41,7 +41,7 @@ class GoogLeNet(nn.Module):## define class GoogLeNet that subclasses the base cl
             dropout: float = 0.2,## define a float called dropout that takes the value 0.2
             dropout_aux: float = 0.7,## define a float called dropout_aux that takes the value 0.7
     ) -> None:
-        super(GoogLeNet, self).__init__()## call the __init__ method of the superclass
+        super(GoogLeNet, self).__init__()## call the __init__ method(constructor) of the superclass
         self.aux_logits = aux_logits## initialize field "aux_logits" of current class
         self.transform_input = transform_input## initialize field "transform_input" of current class
 
@@ -82,45 +82,48 @@ class GoogLeNet(nn.Module):## define class GoogLeNet that subclasses the base cl
         self.inception5a = Inception(832, 256, 160, 320, 32, 128, 128)## create instance of Inception class 
         self.inception5b = Inception(832, 384, 192, 384, 48, 128, 128)## create instance of Inception class 
 
-        if aux_logits:## undefined
-            self.aux1 = InceptionAux(512, num_classes, dropout_aux)## undefined
-            self.aux2 = InceptionAux(528, num_classes, dropout_aux)## undefined
+        if aux_logits:## if aux_logits is true
+            self.aux1 = InceptionAux(512, num_classes, dropout_aux)## create an auxiliary classifier that has 512 input channels, num_classes field equal to num_classes and dropout field equal to dropout_aux
+            self.aux2 = InceptionAux(528, num_classes, dropout_aux)## create an auxiliary classifier that has 528 input channels, num_classes field equal to num_classes and dropout field equal to dropout_aux
         else:
-            self.aux1 = None## undefined
-            self.aux2 = None## undefined
+            self.aux1 = None## define null variable
+            self.aux2 = None## define null variable
 
-        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))## undefined
-        self.dropout = nn.Dropout(dropout, True)## undefined
-        self.fc = nn.Linear(1024, num_classes)## undefined
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))## apply a 2D adaptive average pooling over an input, the target output size is 1x1
+        self.dropout = nn.Dropout(dropout, True)## apply a dropout function with the following arguments: probability of an element to be zeroed is equal to dropout and the operation is done in-place since 2nd argument is equal to true
+        self.fc = nn.Linear(1024, num_classes)## apply a linear transformation  where 1024 is the input size and the output size is equal to num_classes 
 
         # Initialize neural network weights
-        self._initialize_weights()## undefined
+        self._initialize_weights()## call method _initialize_weights
 
-    @torch.jit.unused## undefined
+    @torch.jit.unused## decorator that indicates to the compiler that the following method should be ignored and replaced with the raising of an exception
     def eager_outputs(self, x: Tensor, aux2: Tensor, aux1: Optional[Tensor]) -> GoogLeNetOutputs | Tensor:
-        if self.training and self.aux_logits:## undefined
-            return GoogLeNetOutputs(x, aux2, aux1)## undefined
+        if self.training and self.aux_logits:## if self.training is any value evaluated to true and self.aux_logits is true
+            return GoogLeNetOutputs(x, aux2, aux1)## return instance of  GoogLeNetOutputs class which has the outputs: logits = x, aux_logits2 = aux2, aux_logits1 = aux1
         else:
             return x
 
-    def forward(self, x: Tensor) -> Tuple[Tensor, Optional[Tensor], Optional[Tensor]]:## undefined
-        out = self._forward_impl(x)## undefined
+    def forward(self, x: Tensor) -> Tuple[Tensor, Optional[Tensor], Optional[Tensor]]:## define the "forward" method that takes in a tensor x as input and returns a tuple of 3 tensors(one main output tensor and 2 auxiliary output tensors which are optional)
+        out = self._forward_impl(x)## initialize var "out" with the returned GoogLeNetOutputs structure of the method _forward_impl that takes tensor x as input
 
         return out
 
     def _transform_input(self, x: Tensor) -> Tensor:
         if self.transform_input:
-            x_ch0 = torch.unsqueeze(x[:, 0], 1) * (0.229 / 0.5) + (0.485 - 0.5) / 0.5## undefined
-            x_ch1 = torch.unsqueeze(x[:, 1], 1) * (0.224 / 0.5) + (0.456 - 0.5) / 0.5## undefined
-            x_ch2 = torch.unsqueeze(x[:, 2], 1) * (0.225 / 0.5) + (0.406 - 0.5) / 0.5## undefined
+            x_ch0 = torch.unsqueeze(x[:, 0], 1) * (0.229 / 0.5) + (0.485 - 0.5) / 0.5## selected first channel of tensor x is transformed into a column vector and then multiplied standard deviation and lastly, added with the mean
+            """(0.229 / 0.5) is the standard deviation of the red channel of the dataset divided by the maximum pixel value (0.5)
+                (0.485 - 0.5) / 0.5 is the mean of the red channel of the dataset minus the maximum pixel value (0.5), divided by the maximum pixel value
+            """
+            x_ch1 = torch.unsqueeze(x[:, 1], 1) * (0.224 / 0.5) + (0.456 - 0.5) / 0.5## selected second channel of tensor x is transformed into a column vector and then multiplied standard deviation and lastly, added with the mean
+            x_ch2 = torch.unsqueeze(x[:, 2], 1) * (0.225 / 0.5) + (0.406 - 0.5) / 0.5## selected third channel of tensor x is transformed into a column vector and then multiplied standard deviation and lastly, added with the mean
             x = torch.cat((x_ch0, x_ch1, x_ch2), 1)
         return x
 
     # Support torch.script function
     def _forward_impl(self, x: Tensor) -> GoogLeNetOutputs:
-        x = self._transform_input(x)## undefined
+        x = self._transform_input(x)## update tensor x with the returned structure of method _transform_input that takes x as input
 
-        out = self.conv1(x)## undefined
+        out = self.conv1(x)## 
         out = self.maxpool1(out)## undefined
         out = self.conv2(out)## undefined
         out = self.conv3(out)## undefined
@@ -223,11 +226,11 @@ class Inception(nn.Module):## define class Inception that subclasses the base cl
         return out
 
 
-class InceptionAux(nn.Module):## undefined
-    def __init__(## undefined
-            self,## undefined
-            in_channels: int,## undefined
-            num_classes: int,## undefined
+class InceptionAux(nn.Module):## define class InceptionAux that subclasses the base class for all neural network modules
+    def __init__(## define constructor of this class
+            self,## reference to instance of the class
+            in_channels: int,## number of input channels 
+            num_classes: int,## number of output classes
             dropout: float = 0.7,
     ) -> None:
         super().__init__()

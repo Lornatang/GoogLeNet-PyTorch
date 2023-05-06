@@ -18,7 +18,7 @@ import torch## import torch library
 from torch import Tensor## import vector data type from torch library
 from torch import nn## import neural network things such as various neural network layer types
 
-__all__ = [## define and initialize a list called __all__
+__all__ = [## define and initialize a list of strings called __all__
     "GoogLeNetOutputs",
     "GoogLeNet",
     "BasicConv2d", "Inception", "InceptionAux",
@@ -42,28 +42,45 @@ class GoogLeNet(nn.Module):## define class GoogLeNet that subclasses the base cl
             dropout_aux: float = 0.7,## define a float called dropout_aux that takes the value 0.7
     ) -> None:
         super(GoogLeNet, self).__init__()## call the __init__ method of the superclass
-        self.aux_logits = aux_logits## 
-        self.transform_input = transform_input## undefined
+        self.aux_logits = aux_logits## initialize field "aux_logits" of current class
+        self.transform_input = transform_input## initialize field "transform_input" of current class
 
-        self.conv1 = BasicConv2d(3, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3))## undefined
-        self.maxpool1 = nn.MaxPool2d((3, 3), (2, 2), ceil_mode=True)## undefined
-        self.conv2 = BasicConv2d(64, 64, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0))## undefined
-        self.conv3 = BasicConv2d(64, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))## undefined
-        self.maxpool2 = nn.MaxPool2d((3, 3), (2, 2), ceil_mode=True)## undefined
+        self.conv1 = BasicConv2d(3, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3))## initialize with 2D convolutional layer having:
+        """3 input channels
+            64 ouput channels
+            7x7 kernel used by the layer
+            stride=(2,2) means the kernel will move by 2 pixels horizontally and vertically across the input in each step
+            padding=(3,3) means a padding of 3 pixels will be added on each side of the input"""
+        self.maxpool1 = nn.MaxPool2d((3, 3), (2, 2), ceil_mode=True)## apply a 2D max pooling over input
+        """= downsampling operation in its input tensor by dividing it into small rectangular regions 
+            and taking the maximum value within each region
+           (3,3) - the size of the pooling window(kernel)
+           (2,2) - the stride of the pooling operation(step size)
+           ceil_mode=True - use ceil(instead of floor) when computing output shape"""
+        self.conv2 = BasicConv2d(64, 64, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0))## initialize with 2D convolutional layer, see more details at line 49
+        self.conv3 = BasicConv2d(64, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))## initialize with 2D convolutional layer, see more details at line 49
+        self.maxpool2 = nn.MaxPool2d((3, 3), (2, 2), ceil_mode=True)## apply 2D max pooling over input
 
-        self.inception3a = Inception(192, 64, 96, 128, 16, 32, 32)## undefined
-        self.inception3b = Inception(256, 128, 128, 192, 32, 96, 64)## undefined
-        self.maxpool3 = nn.MaxPool2d((3, 3), (2, 2), ceil_mode=True)## undefined
+        self.inception3a = Inception(192, 64, 96, 128, 16, 32, 32)## create instance of Inception class 
+        """in_channels = 192,
+            ch1x1 = 64,
+            ch3x3red = 96,
+            ch3x3 = 128,
+            ch5x5red = 16,
+            ch5x5 = 32,
+            pool_proj = 32"""
+        self.inception3b = Inception(256, 128, 128, 192, 32, 96, 64)## create instance of Inception class 
+        self.maxpool3 = nn.MaxPool2d((3, 3), (2, 2), ceil_mode=True)## apply 2D max pooling over input
 
-        self.inception4a = Inception(480, 192, 96, 208, 16, 48, 64)## undefined
-        self.inception4b = Inception(512, 160, 112, 224, 24, 64, 64)## undefined
-        self.inception4c = Inception(512, 128, 128, 256, 24, 64, 64)## undefined
-        self.inception4d = Inception(512, 112, 144, 288, 32, 64, 64)## undefined
-        self.inception4e = Inception(528, 256, 160, 320, 32, 128, 128)## undefined
-        self.maxpool4 = nn.MaxPool2d((2, 2), (2, 2), ceil_mode=True)## undefined
+        self.inception4a = Inception(480, 192, 96, 208, 16, 48, 64)## create instance of Inception class 
+        self.inception4b = Inception(512, 160, 112, 224, 24, 64, 64)## create instance of Inception class 
+        self.inception4c = Inception(512, 128, 128, 256, 24, 64, 64)## create instance of Inception class 
+        self.inception4d = Inception(512, 112, 144, 288, 32, 64, 64)## create instance of Inception class 
+        self.inception4e = Inception(528, 256, 160, 320, 32, 128, 128)## create instance of Inception class 
+        self.maxpool4 = nn.MaxPool2d((2, 2), (2, 2), ceil_mode=True)## apply 2D max pooling over input
 
-        self.inception5a = Inception(832, 256, 160, 320, 32, 128, 128)## undefined
-        self.inception5b = Inception(832, 384, 192, 384, 48, 128, 128)## undefined
+        self.inception5a = Inception(832, 256, 160, 320, 32, 128, 128)## create instance of Inception class 
+        self.inception5b = Inception(832, 384, 192, 384, 48, 128, 128)## create instance of Inception class 
 
         if aux_logits:## undefined
             self.aux1 = InceptionAux(512, num_classes, dropout_aux)## undefined
@@ -165,16 +182,16 @@ class BasicConv2d(nn.Module):## undefined
         return out
 
 
-class Inception(nn.Module):## undefined
+class Inception(nn.Module):## define class Inception that subclasses the base class for all neural network modules
     def __init__(
             self,
-            in_channels: int,## undefined
-            ch1x1: int,## undefined
-            ch3x3red: int,## undefined
-            ch3x3: int,## undefined
-            ch5x5red: int,## undefined
-            ch5x5: int,## undefined
-            pool_proj: int,## undefined
+            in_channels: int,## number of input channels
+            ch1x1: int,## number of 1x1 filters
+            ch3x3red: int,## number of 1x1 filters in the reduction layer used before the 3x3 convolution
+            ch3x3: int,## number of 3x3 filters
+            ch5x5red: int,## number of 1x1 filters in the reduction layer used before the 5x5 convolution
+            ch5x5: int,## number of 5x5 filters
+            pool_proj: int,## number of 1×1 filters in the projection layer after the built-in max-pooling  
     ) -> None:
         super(Inception, self).__init__()
         self.branch1 = BasicConv2d(in_channels, ch1x1, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0))## undefined

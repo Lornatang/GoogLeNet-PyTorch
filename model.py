@@ -123,33 +123,33 @@ class GoogLeNet(nn.Module):## define class GoogLeNet that subclasses the base cl
     def _forward_impl(self, x: Tensor) -> GoogLeNetOutputs:
         x = self._transform_input(x)## update tensor x with the returned structure of method _transform_input that takes x as input
 
-        out = self.conv1(x)## 
-        out = self.maxpool1(out)## undefined
-        out = self.conv2(out)## undefined
-        out = self.conv3(out)## undefined
-        out = self.maxpool2(out)## undefined
+        out = self.conv1(x)## apply conv1 on x and assign it to out
+        out = self.maxpool1(out)## apply conv1 on out and assign it again to out
+        out = self.conv2(out)## apply conv2 on out and assign it again to out
+        out = self.conv3(out)## apply conv3 on out and assign it again to out
+        out = self.maxpool2(out)## apply maxpool2 on out and assign it again to out
 
-        out = self.inception3a(out)## undefined
-        out = self.inception3b(out)## undefined
-        out = self.maxpool3(out)## undefined
-        out = self.inception4a(out)## undefined
+        out = self.inception3a(out)## apply inception3a on out and assign it again to out
+        out = self.inception3b(out)## apply inception3b on out and assign it again to out
+        out = self.maxpool3(out)## apply maxpool3 on out and assign it again to out
+        out = self.inception4a(out)## apply inception4a on out and assign it again to out
         aux1: Optional[Tensor] = None## undefined
         if self.aux1 is not None:## undefined
             if self.training:## undefined
                 aux1 = self.aux1(out)## undefined
 
-        out = self.inception4b(out)## undefined
-        out = self.inception4c(out)## undefined
-        out = self.inception4d(out)## undefined
+        out = self.inception4b(out)## apply inception4b on out and assign it again to out
+        out = self.inception4c(out)## apply inception4c on out and assign it again to out
+        out = self.inception4d(out)## apply inception4d on out and assign it again to out
         aux2: Optional[Tensor] = None## undefined
         if self.aux2 is not None:## undefined
             if self.training:## undefined
                 aux2 = self.aux2(out)## undefined
 
-        out = self.inception4e(out)## undefined
-        out = self.maxpool4(out)## undefined
-        out = self.inception5a(out)## undefined
-        out = self.inception5b(out)## undefined
+        out = self.inception4e(out)## apply inception4e on out and assign it again to out
+        out = self.maxpool4(out)## apply maxpoo4 on out and assign it again to out
+        out = self.inception5a(out)## apply inception5a on out and assign it again to out
+        out = self.inception5b(out)## apply inception5b on out and assign it again to out
 
         out = self.avgpool(out)## undefined
         out = torch.flatten(out, 1)## undefined

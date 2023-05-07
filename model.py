@@ -133,54 +133,54 @@ class GoogLeNet(nn.Module):## define class GoogLeNet that subclasses the base cl
         out = self.inception3b(out)## apply inception3b on out and assign it again to out
         out = self.maxpool3(out)## apply maxpool3 on out and assign it again to out
         out = self.inception4a(out)## apply inception4a on out and assign it again to out
-        aux1: Optional[Tensor] = None## undefined
-        if self.aux1 is not None:## undefined
-            if self.training:## undefined
-                aux1 = self.aux1(out)## undefined
+        aux1: Optional[Tensor] = None## aux1 is an optional var of type Tensor, initially set to None
+        if self.aux1 is not None:## if aux1 is different from None
+            if self.training:## if self.training is any value that evaluates to true
+                aux1 = self.aux1(out)## apply aux1 on out and assign it to aux1
 
         out = self.inception4b(out)## apply inception4b on out and assign it again to out
         out = self.inception4c(out)## apply inception4c on out and assign it again to out
         out = self.inception4d(out)## apply inception4d on out and assign it again to out
-        aux2: Optional[Tensor] = None## undefined
-        if self.aux2 is not None:## undefined
-            if self.training:## undefined
-                aux2 = self.aux2(out)## undefined
+        aux2: Optional[Tensor] = None## aux2 is an optional var of type Tensor, initially set to None
+        if self.aux2 is not None:## if aux2 is different from None
+            if self.training:## if self.training is any value that evaluates to true
+                aux2 = self.aux2(out)## apply aux2 on out and assign it to aux2
 
         out = self.inception4e(out)## apply inception4e on out and assign it again to out
         out = self.maxpool4(out)## apply maxpoo4 on out and assign it again to out
         out = self.inception5a(out)## apply inception5a on out and assign it again to out
         out = self.inception5b(out)## apply inception5b on out and assign it again to out
 
-        out = self.avgpool(out)## undefined
-        out = torch.flatten(out, 1)## undefined
-        out = self.dropout(out)## undefined
-        aux3 = self.fc(out)## undefined
+        out = self.avgpool(out)## apply avgpool on out and assign it again to out
+        out = torch.flatten(out, 1)## flatten tensor out into a 2D matrix starting from dimension 1(second  dimension) and assign the result to out
+        out = self.dropout(out)## apply dropout on out and assign it again to out
+        aux3 = self.fc(out)## apply fc on out and assign it to aux3
 
-        if torch.jit.is_scripting():## undefined
-            return GoogLeNetOutputs(aux3, aux2, aux1)## undefined
+        if torch.jit.is_scripting():## if code is being executed in script mode
+            return GoogLeNetOutputs(aux3, aux2, aux1)## return instance of  GoogLeNetOutputs class which has the outputs: logits = aux3, aux_logits2 = aux2, aux_logits1 = aux1
         else:
-            return self.eager_outputs(aux3, aux2, aux1)## undefined
+            return self.eager_outputs(aux3, aux2, aux1)## return result of calling the method eager_outputs with arguments aux3, aux2 and aux1
 
-    def _initialize_weights(self) -> None:## undefined
+    def _initialize_weights(self) -> None:## define _initialize_weights method that has as parameter a reference to the current instance of the class
         for module in self.modules():
-            if isinstance(module, nn.Conv2d) or isinstance(module, nn.Linear):## undefined
-                torch.nn.init.trunc_normal_(module.weight, mean=0.0, std=0.01, a=-2, b=2)## undefined
-            elif isinstance(module, nn.BatchNorm2d):## undefined
-                nn.init.constant_(module.weight, 1)## undefined
-                nn.init.constant_(module.bias, 0)## undefined
+            if isinstance(module, nn.Conv2d) or isinstance(module, nn.Linear):## check whether the module is either an instance of the nn.Conv2D or nn.Linear classes, which correspond to 2D convolutional and linear layers, respectively
+                torch.nn.init.trunc_normal_(module.weight, mean=0.0, std=0.01, a=-2, b=2)## fill in input tensor with values from a truncated normal distribution with mean 0.0, standard deviation 0.01, and range [-2, 2]
+            elif isinstance(module, nn.BatchNorm2d):## else, check if the module is an instance of the nn.BatchNorm2d class(batch normalization)
+                nn.init.constant_(module.weight, 1)## fill input tensor with the value 1 
+                nn.init.constant_(module.bias, 0)## fill input tensor with the value 0
 
 
-class BasicConv2d(nn.Module):## undefined
+class BasicConv2d(nn.Module):## define a class that inherits from nn.Module class in PyTorch
     def __init__(self, in_channels: int, out_channels: int, **kwargs: Any) -> None:
-        super(BasicConv2d, self).__init__()## undefined
+        super(BasicConv2d, self).__init__()## call constructor of the parent class
         self.conv = nn.Conv2d(in_channels, out_channels, bias=False, **kwargs)
         self.bn = nn.BatchNorm2d(out_channels, eps=0.001)
-        self.relu = nn.ReLU(True)## undefined
+        self.relu = nn.ReLU(True)## applies rectified linear unit activation function element-wise; uses an in-place operation
 
     def forward(self, x: Tensor) -> Tensor:
-        out = self.conv(x)## undefined
-        out = self.bn(out)## undefined
-        out = self.relu(out)## undefined
+        out = self.conv(x)## apply conv on tensor x and store the result in variable out
+        out = self.bn(out)## apply bn on out and assign it to out
+        out = self.relu(out)## apply relu on out and assign to it out
 
         return out
 
@@ -197,31 +197,31 @@ class Inception(nn.Module):## define class Inception that subclasses the base cl
             pool_proj: int,## number of 1×1 filters in the projection layer after the built-in max-pooling  
     ) -> None:
         super(Inception, self).__init__()
-        self.branch1 = BasicConv2d(in_channels, ch1x1, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0))## undefined
+        self.branch1 = BasicConv2d(in_channels, ch1x1, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0))## initialize with 2D convolutional layer
 
         self.branch2 = nn.Sequential(
-            BasicConv2d(in_channels, ch3x3red, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0)),## undefined
-            BasicConv2d(ch3x3red, ch3x3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),## undefined
+            BasicConv2d(in_channels, ch3x3red, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0)),## initialize with 2D convolutional layer
+            BasicConv2d(ch3x3red, ch3x3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),## initialize with 2D convolutional layer
         )
 
         self.branch3 = nn.Sequential(
-            BasicConv2d(in_channels, ch5x5red, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0)),## undefined
-            BasicConv2d(ch5x5red, ch5x5, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),## undefined
+            BasicConv2d(in_channels, ch5x5red, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0)),## initialize with 2D convolutional layer
+            BasicConv2d(ch5x5red, ch5x5, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),## initialize with 2D convolutional layer
         )
 
         self.branch4 = nn.Sequential(
-            nn.MaxPool2d(kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), ceil_mode=True),## undefined
-            BasicConv2d(in_channels, pool_proj, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0)),## undefined
+            nn.MaxPool2d(kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), ceil_mode=True),## apply a 2D max pooling over input
+            BasicConv2d(in_channels, pool_proj, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0)),## initialize with 2D convolutional layer
         )
 
-    def forward(self, x: Tensor) -> Tensor:## undefined
-        branch1 = self.branch1(x)## undefined
-        branch2 = self.branch2(x)## undefined
-        branch3 = self.branch3(x)## undefined
-        branch4 = self.branch4(x)## undefined
-        out = [branch1, branch2, branch3, branch4]## undefined
+    def forward(self, x: Tensor) -> Tensor:## define method forward that takees an input tensor x and returns an output tensor
+        branch1 = self.branch1(x)## apply branch on tensor x and store the result in branch1
+        branch2 = self.branch2(x)## apply branch on tensor x and store the result in branch2
+        branch3 = self.branch3(x)## apply branch on tensor x and store the result in branch3
+        branch4 = self.branch4(x)## apply branch on tensor x and store the result in branch4
+        out = [branch1, branch2, branch3, branch4]## create a list of 4 tensors and store it in out variable 
 
-        out = torch.cat(out, 1)## undefined
+        out = torch.cat(out, 1)## concatenate the tensors in the list out along the second dimension
 
         return out
 
@@ -234,26 +234,26 @@ class InceptionAux(nn.Module):## define class InceptionAux that subclasses the b
             dropout: float = 0.7,
     ) -> None:
         super().__init__()
-        self.avgpool = nn.AdaptiveAvgPool2d((4, 4))## undefined
-        self.conv = BasicConv2d(in_channels, 128, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0))## undefined
-        self.relu = nn.ReLU(True)## undefined
-        self.fc1 = nn.Linear(2048, 1024)## undefined
-        self.fc2 = nn.Linear(1024, num_classes)## undefined
-        self.dropout = nn.Dropout(dropout, True)## undefined
+        self.avgpool = nn.AdaptiveAvgPool2d((4, 4))## apply a 2D adaptive average pooling over an input, the target output size is 4x4
+        self.conv = BasicConv2d(in_channels, 128, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0))## initialize with 2D convolutional layer
+        self.relu = nn.ReLU(True)## applies rectified linear unit activation function element-wise; uses an in-place operation
+        self.fc1 = nn.Linear(2048, 1024)## apply a linear transformation  where 2048 is the input size and the output size is 1024 
+        self.fc2 = nn.Linear(1024, num_classes)## apply a linear transformation  where 1024 is the input size and the output size is equal to num_classes 
+        self.dropout = nn.Dropout(dropout, True)## apply a dropout function with the following arguments: probability of an element to be zeroed is equal to dropout and the operation is done in-place since 2nd argument is equal to true
 
     def forward(self, x: Tensor) -> Tensor:
-        out = self.avgpool(x)## undefined
-        out = self.conv(out)## undefined
-        out = torch.flatten(out, 1)## undefined
-        out = self.fc1(out)## undefined
-        out = self.relu(out)## undefined
-        out = self.dropout(out)## undefined
-        out = self.fc2(out)## undefined
+        out = self.avgpool(x)## apply avgpool on x and store the result in out
+        out = self.conv(out)## apply conv on out and assign it back to out
+        out = torch.flatten(out, 1)## flatten tensor out into a 2D matrix starting from dimension 1(second  dimension) and assign the result to out
+        out = self.fc1(out)## apply fc1 on out and assign it back to out
+        out = self.relu(out)## apply relu on out and assign it back to out
+        out = self.dropout(out)## apply dropout on out and assign it back to out
+        out = self.fc2(out)## apply fc2 on out and assign it back to out
 
         return out
 
 
-def googlenet(**kwargs: Any) -> GoogLeNet:## undefined
+def googlenet(**kwargs: Any) -> GoogLeNet:## define function googlenet that takes any number of keyword arguments and returns an instance of the GoogLeNet class
     model = GoogLeNet(**kwargs)
 
     return model

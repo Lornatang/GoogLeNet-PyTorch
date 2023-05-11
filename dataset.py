@@ -11,20 +11,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-import queue## undefined
-import sys## undefined
-import threading## undefined
-from glob import glob## undefined
+import queue## import queue module
+import sys## import sys module which lets us access system-specific parameters and functions
+import threading## import threading module which allows us to create and manage new threads of execution
+from glob import glob## import function glob from module glob which returns all file paths that match a specific pattern
 
-import cv2## undefined
-import torch## undefined
-from PIL import Image## undefined
-from torch.utils.data import Dataset, DataLoader## undefined
-from torchvision import transforms## undefined
-from torchvision.datasets.folder import find_classes## undefined
-from torchvision.transforms import TrivialAugmentWide## undefined
+import cv2## import opencv module which allows us to perform image processing and computer vision tasks
+import torch## import torch library which allows us to work with deep neural networks
+from PIL import Image## import Image module from PIL module 
+from torch.utils.data import Dataset, DataLoader## import modules that load and handle data during the training of deep learning models
+from torchvision import transforms## import module that provides a set of common image transformations that can be used to preprocess or augment image data
+from torchvision.datasets.folder import find_classes## import function that is used to find folder names in a given directory
+from torchvision.transforms import TrivialAugmentWide## import dataset-independent data-augmentation
 
-import imgproc## undefined
+import imgproc## import imgproc module
 
 __all__ = [
     "ImageDataset",
@@ -32,16 +32,16 @@ __all__ = [
 ]
 
 # Image formats supported by the image processing library
-IMG_EXTENSIONS = ("jpg", "jpeg", "png", "ppm", "bmp", "pgm", "tif", "tiff", "webp")## undefined
+IMG_EXTENSIONS = ("jpg", "jpeg", "png", "ppm", "bmp", "pgm", "tif", "tiff", "webp")## tuple of supported file extensions used for image files
 
 # The delimiter is not the same between different platforms
-if sys.platform == "win32":## undefined
-    delimiter = "\\"## undefined
+if sys.platform == "win32":## check if operating system is Windows
+    delimiter = "\\"## use "\\" when delimitating
 else:
-    delimiter = "/"## undefined
+    delimiter = "/"## use "/" when delimitating
 
 
-class ImageDataset(Dataset):## undefined
+class ImageDataset(Dataset):## define class ImageDataset that inherits from Dataset
     """Define training/valid dataset loading methods.
 
     Args:
@@ -51,37 +51,37 @@ class ImageDataset(Dataset):## undefined
             and the verification data set is not for data enhancement.
     """
 
-    def __init__(self, image_dir: str, image_size: int, mode: str) -> None:## undefined
-        super(ImageDataset, self).__init__()## undefined
+    def __init__(self, image_dir: str, image_size: int, mode: str) -> None:## define constructor that takes as arguments the dataset address, image size and mode
+        super(ImageDataset, self).__init__()## call constructor of superclass
         # Iterate over all image paths
-        self.image_file_paths = glob(f"{image_dir}/*/*")## undefined
+        self.image_file_paths = glob(f"{image_dir}/*/*")## find all image paths that are in any subdirectory of image_dir
         # Form image class label pairs by the folder where the image is located
-        _, self.class_to_idx = find_classes(image_dir)## undefined
-        self.image_size = image_size## undefined
-        self.mode = mode## undefined
-        self.delimiter = delimiter## undefined
+        _, self.class_to_idx = find_classes(image_dir)## discard the first element of the tuple(the list of image paths) and store the 2nd element(dictionary mapping class names to class indices)  
+        self.image_size = image_size## assign the image size
+        self.mode = mode## assign the mode
+        self.delimiter = delimiter## assign the delimiter
 
-        if self.mode == "Train":## undefined
+        if self.mode == "Train":## if we are in training mode
             # Use PyTorch's own data enhancement to enlarge and enhance data
-            self.pre_transform = transforms.Compose([## undefined
-                transforms.RandomResizedCrop(self.image_size),## undefined
-                TrivialAugmentWide(),## undefined
-                transforms.RandomRotation([0, 270]),## undefined
-                transforms.RandomHorizontalFlip(0.5),## undefined
-                transforms.RandomVerticalFlip(0.5),## undefined
+            self.pre_transform = transforms.Compose([## compose several transforms together
+                transforms.RandomResizedCrop(self.image_size),## crop a random portion of image and resize it to the given size
+                TrivialAugmentWide(),## data-augmentation
+                transforms.RandomRotation([0, 270]),## rotate image with a degree randomly selected from the range
+                transforms.RandomHorizontalFlip(0.5),## horizontally flip the given image randomly with the given probability
+                transforms.RandomVerticalFlip(0.5),## vertically flip the given image randomly with the given probability
             ])
-        elif self.mode == "Valid" or self.mode == "Test":## undefined
+        elif self.mode == "Valid" or self.mode == "Test":## if we are in a valid or test mode
             # Use PyTorch's own data enhancement to enlarge and enhance data
-            self.pre_transform = transforms.Compose([## undefined
-                transforms.Resize(256),## undefined
-                transforms.CenterCrop([self.image_size, self.image_size]),## undefined
+            self.pre_transform = transforms.Compose([## compose several transforms together
+                transforms.Resize(256),## resize the input image to the given size
+                transforms.CenterCrop([self.image_size, self.image_size]),## crops the crops the given image at the center(square crop with size image_size)
             ])
         else:
-            raise "Unsupported data read type. Please use `Train` or `Valid` or `Test`"## undefined
+            raise "Unsupported data read type. Please use `Train` or `Valid` or `Test`"## else raise an exception
 
-        self.post_transform = transforms.Compose([## undefined
-            transforms.ConvertImageDtype(torch.float),## undefined
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])## undefined
+        self.post_transform = transforms.Compose([## compose several transform together
+            transforms.ConvertImageDtype(torch.float),## convert a tensor image to the type float and scale the values accordingly
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])## normalize a tensor image with mean and standard deviation for 3 channels
         ])
 
     def __getitem__(self, batch_index: int) -> [torch.Tensor, int]:## undefined

@@ -84,39 +84,39 @@ class ImageDataset(Dataset):## define class ImageDataset that inherits from Data
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])## normalize a tensor image with mean and standard deviation for 3 channels
         ])
 
-    def __getitem__(self, batch_index: int) -> [torch.Tensor, int]:## undefined
-        image_dir, image_name = self.image_file_paths[batch_index].split(self.delimiter)[-2:]## undefined
+    def __getitem__(self, batch_index: int) -> [torch.Tensor, int]:## method that takes an integer batch_index and returns a tuple of a tensor and an index(label index for the class the image belongs to)
+        image_dir, image_name = self.image_file_paths[batch_index].split(self.delimiter)[-2:]## get path of image using batch_index and extract from it the directory path and image name 
         # Read a batch of image data
-        if image_name.split(".")[-1].lower() in IMG_EXTENSIONS:## undefined
-            image = cv2.imread(self.image_file_paths[batch_index])## undefined
-            target = self.class_to_idx[image_dir]## undefined
+        if image_name.split(".")[-1].lower() in IMG_EXTENSIONS:## get file extension, then lowercase it and check if it can be found in the list IMG_EXTENSIONS(file name string is split at period(.))
+            image = cv2.imread(self.image_file_paths[batch_index])## read image where the path is accessed in the list of paths using batch index
+            target = self.class_to_idx[image_dir]## retrieve the index of the class to which the current image belongs based on the directory of the image
         else:
             raise ValueError(f"Unsupported image extensions, Only support `{IMG_EXTENSIONS}`, "
                              "please check the image file extensions.")
 
         # BGR to RGB
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)## undefined
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)## convert image from BGR(blue-green-red) to RGB(red-green-blue)
 
         # OpenCV convert PIL
-        image = Image.fromarray(image)## undefined
+        image = Image.fromarray(image)## convert above image to a 'PIL' image
 
         # Data preprocess
-        image = self.pre_transform(image)## undefined
+        image = self.pre_transform(image)## apply pre_transform function on the image
 
         # Convert image data into Tensor stream format (PyTorch).
         # Note: The range of input and output is between [0, 1]
-        tensor = imgproc.image_to_tensor(image, False, False)## undefined
+        tensor = imgproc.image_to_tensor(image, False, False)## convert image to tensor
 
         # Data postprocess
-        tensor = self.post_transform(tensor)## undefined
+        tensor = self.post_transform(tensor)## apply post_transform functions on the image
 
-        return {"image": tensor, "target": target}## undefined
+        return {"image": tensor, "target": target}## return list of 2 tuples, each containing a tensor(representing the image) and an int(representing the target class index)
 
     def __len__(self) -> int:
-        return len(self.image_file_paths)## undefined
+        return len(self.image_file_paths)## return the number of image paths
 
 
-class PrefetchGenerator(threading.Thread):## undefined
+class PrefetchGenerator(threading.Thread):## define class PrefetchGenerator that inherits from the thread module
     """A fast data prefetch generator.
 
     Args:
@@ -124,10 +124,10 @@ class PrefetchGenerator(threading.Thread):## undefined
         num_data_prefetch_queue (int): How many early data load queues.
     """
 
-    def __init__(self, generator, num_data_prefetch_queue: int) -> None:## undefined
-        threading.Thread.__init__(self)## undefined
+    def __init__(self, generator, num_data_prefetch_queue: int) -> None:## constructor that takes 2 parameters: generator(data generator object that will produce batches of data) and an integer that represents the number of data batches that should be loaded in advance
+        threading.Thread.__init__(self)## call constructor of superclass
         self.queue = queue.Queue(num_data_prefetch_queue)## undefined
-        self.generator = generator## undefined
+        self.generator = generator## initialize generator
         self.daemon = True
         self.start()## undefined
 

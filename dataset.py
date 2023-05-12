@@ -174,16 +174,16 @@ class CPUPrefetcher:## define class CPUPrefetcher
         self.data = iter(dataloader)## create an iterator from the data loader
 
     def next(self):
-        try:## undefined
-            return next(self.data)## undefined
+        try:## test the following block of code for errors
+            return next(self.data)## return next item from the iterator self.data
         except StopIteration:
             return None
 
     def reset(self):
-        self.data = iter(self.original_dataloader)## undefined
+        self.data = iter(self.original_dataloader)## initialize with iterator over original_dataloader
 
     def __len__(self) -> int:
-        return len(self.original_dataloader)## undefined
+        return len(self.original_dataloader)## return the length of the original_dataloader
 
 
 class CUDAPrefetcher:
@@ -194,35 +194,35 @@ class CUDAPrefetcher:
         device (torch.device): Specify running device.
     """
 
-    def __init__(self, dataloader, device: torch.device):## undefined
-        self.batch_data = None## undefined
-        self.original_dataloader = dataloader## undefined
-        self.device = device## undefined
+    def __init__(self, dataloader, device: torch.device):## define constructor that takes as arguments a data loader and a device which is an instance of torch.device(device to use for computation: CPU or GPU)
+        self.batch_data = None## initialize to None
+        self.original_dataloader = dataloader## intialize data loader
+        self.device = device## initialize with device
 
-        self.data = iter(dataloader)## undefined
-        self.stream = torch.cuda.Stream()## undefined
+        self.data = iter(dataloader)## create an iterator over the data loader
+        self.stream = torch.cuda.Stream()## create a new CUDA stream(linear sequence of execution that belongs to the current device)
         self.preload()
 
-    def preload(self):## undefined
-        try:## undefined
-            self.batch_data = next(self.data)## undefined
-        except StopIteration:## undefined
-            self.batch_data = None## undefined
-            return None## undefined
+    def preload(self):## define preload method
+        try:## test the following block of code for errors
+            self.batch_data = next(self.data)## apply function called next on iterator data
+        except StopIteration:## handle the error
+            self.batch_data = None## set batch_data to None
+            return None## doesn't need to return any value(or value is not relevant)
 
-        with torch.cuda.stream(self.stream):## undefined
-            for k, v in self.batch_data.items():## undefined
-                if torch.is_tensor(v):## undefined## undefined
-                    self.batch_data[k] = self.batch_data[k].to(self.device, non_blocking=True)
+        with torch.cuda.stream(self.stream):## specify that any CUDA operations executed within this block should be added to the specified CUDA stream
+            for k, v in self.batch_data.items():## for loop that iterates through the key-value pairs in the dictionary self.batch_data
+                if torch.is_tensor(v):## check is value v is a tensor
+                    self.batch_data[k] = self.batch_data[k].to(self.device, non_blocking=True)## move tensor self.batch_data[k] to a specified device() (non_blocking being true allows the function to return immediately while the device is being used for other operations)
 
-    def next(self):## undefined
-        torch.cuda.current_stream().wait_stream(self.stream)## undefined
-        batch_data = self.batch_data## undefined
-        self.preload()## undefined
-        return batch_data## undefined
+    def next(self):## define method called next
+        torch.cuda.current_stream().wait_stream(self.stream)## synchronize the current CUDA stream with self.stream
+        batch_data = self.batch_data## initialize batch_data
+        self.preload()## call preload method
+        return batch_data## return batch data that has been transfered to the device after being pre-fetched
 
-    def reset(self):## undefined
-        self.data = iter(self.original_dataloader)## undefined
+    def reset(self):## define method called reset
+        self.data = iter(self.original_dataloader)## create an iterator over original_dataloader
         self.preload()
 
     def __len__(self) -> int:

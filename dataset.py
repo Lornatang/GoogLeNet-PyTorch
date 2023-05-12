@@ -126,27 +126,27 @@ class PrefetchGenerator(threading.Thread):## define class PrefetchGenerator that
 
     def __init__(self, generator, num_data_prefetch_queue: int) -> None:## constructor that takes 2 parameters: generator(data generator object that will produce batches of data) and an integer that represents the number of data batches that should be loaded in advance
         threading.Thread.__init__(self)## call constructor of superclass
-        self.queue = queue.Queue(num_data_prefetch_queue)## undefined
+        self.queue = queue.Queue(num_data_prefetch_queue)## create a queue with a max size of num_data_prefetch_queue
         self.generator = generator## initialize generator
         self.daemon = True
-        self.start()## undefined
+        self.start()## method call that starts the execution of the PrefetchGenerator thread(when start() is called, the run() method of the thread is executed)
 
-    def run(self) -> None:## undefined
-        for item in self.generator:## undefined
-            self.queue.put(item)## undefined
-        self.queue.put(None)## undefined
+    def run(self) -> None:## define the behaviour of the thread
+        for item in self.generator:## for loop that iterates through the self.generator iterable object
+            self.queue.put(item)## add item at the end of the queue
+        self.queue.put(None)## add None in the queue so as to signal that there is no more data to be processed
 
     def __next__(self):
-        next_item = self.queue.get()## undefined
-        if next_item is None:## undefined
-            raise StopIteration## undefined
-        return next_item## undefined
+        next_item = self.queue.get()## remove and return an item from the queue
+        if next_item is None:## check whether value of next_item is None
+            raise StopIteration## if so, raise an exception so as to stop iterating
+        return next_item## return the item
 
     def __iter__(self):
         return self
 
 
-class PrefetchDataLoader(DataLoader):## undefined
+class PrefetchDataLoader(DataLoader):## define PrefetchDataLoader class that inherits from DataLoader class
     """A fast data prefetch dataloader.
 
     Args:
@@ -155,23 +155,23 @@ class PrefetchDataLoader(DataLoader):## undefined
     """
 
     def __init__(self, num_data_prefetch_queue: int, **kwargs) -> None:
-        self.num_data_prefetch_queue = num_data_prefetch_queue## undefined
-        super(PrefetchDataLoader, self).__init__(**kwargs)## undefined
+        self.num_data_prefetch_queue = num_data_prefetch_queue## initialize num_data_prefetch_queue
+        super(PrefetchDataLoader, self).__init__(**kwargs)## call constructor of the superclass with the rest of possible arguments
 
     def __iter__(self):
-        return PrefetchGenerator(super().__iter__(), self.num_data_prefetch_queue)## undefined
+        return PrefetchGenerator(super().__iter__(), self.num_data_prefetch_queue)## return instance of PrefetchGenerator class which takes as arguments an iterator for the data loader and the max number of data samples that can be prefetched at a time
 
 
-class CPUPrefetcher:## undefined
+class CPUPrefetcher:## define class CPUPrefetcher
     """Use the CPU side to accelerate data reading.
 
     Args:
         dataloader (DataLoader): Data loader. Combines a dataset and a sampler, and provides an iterable over the given dataset.
     """
 
-    def __init__(self, dataloader) -> None:## undefined
-        self.original_dataloader = dataloader## undefined
-        self.data = iter(dataloader)## undefined
+    def __init__(self, dataloader) -> None:## define constructor that takes as argument a data loader
+        self.original_dataloader = dataloader## initialize data loader
+        self.data = iter(dataloader)## create an iterator from the data loader
 
     def next(self):
         try:## undefined

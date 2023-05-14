@@ -11,15 +11,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-import argparse## undefined
-import json## undefined
-import os## undefined
+import argparse## import module for creating command-line interfaces and parsing command-line arguments
+import json## module that provides functionality to encode and decode JSON data
+import os## import os module(functions for interacting with the operating system)
 
-import cv2## undefined
-import torch## undefined
-from PIL import Image## undefined
+import cv2## import opencv module which allows us to perform image processing and computer vision tasks
+import torch## import torch library
+from PIL import Image## import Image module from PIL module
 from torch import nn
-from torchvision.transforms import Resize, ConvertImageDtype, Normalize## undefined
+from torchvision.transforms import Resize, ConvertImageDtype, Normalize## import three transformation functions 
 
 import imgproc
 import model
@@ -54,26 +54,26 @@ def build_model(model_arch_name: str, model_num_classes: int, device: torch.devi
     return googlenet_model## undefined
 
 
-def preprocess_image(image_path: str, image_size: int, device: torch.device) -> torch.Tensor:## undefined
-    image = cv2.imread(image_path)## undefined
+def preprocess_image(image_path: str, image_size: int, device: torch.device) -> torch.Tensor:## define function that takes as arguments the image path, image size and an instance of torch.device
+    image = cv2.imread(image_path)## read image knowing the image path
 
     # BGR to RGB
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)## undefined
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)## convert image from BGR to RGB
 
     # OpenCV convert PIL
-    image = Image.fromarray(image)## undefined
+    image = Image.fromarray(image)## convert image to a 'PIL' image
 
     # Resize to 224
-    image = Resize([image_size, image_size])(image)## undefined
+    image = Resize([image_size, image_size])(image)## resize image to image_size x image_size
     # Convert image data to pytorch format data
-    tensor = imgproc.image_to_tensor(image, False, False).unsqueeze_(0)## undefined
+    tensor = imgproc.image_to_tensor(image, False, False).unsqueeze_(0)## convert image to tensor, then unsqueeze along the first dimension
     # Convert a tensor image to the given ``dtype`` and scale the values accordingly
-    tensor = ConvertImageDtype(torch.float)(tensor)## undefined
+    tensor = ConvertImageDtype(torch.float)(tensor)## convert tensor image to torch.float
     # Normalize a tensor image with mean and standard deviation.
-    tensor = Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])(tensor)## undefined
+    tensor = Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])(tensor)## normalize a tensor image with mean and standard deviation for 3 channels
 
     # Transfer tensor channel image format data to CUDA device
-    tensor = tensor.to(device=device, memory_format=torch.channels_last, non_blocking=True)## undefined
+    tensor = tensor.to(device=device, memory_format=torch.channels_last, non_blocking=True)## transfer tensor image format data to CUDA device
 
     return tensor
 

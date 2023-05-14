@@ -11,21 +11,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-import os## undefined
-import time## undefined
+import os## import os module(functions for interacting with the operating system)
+import time## import time module
 
 import torch
 from torch import nn
-from torch import optim## undefined
-from torch.cuda import amp## undefined
-from torch.optim import lr_scheduler## undefined
-from torch.optim.swa_utils import AveragedModel## undefined
-from torch.utils.data import DataLoader## undefined
-from torch.utils.tensorboard import SummaryWriter## undefined
+from torch import optim## import optimization library(which provides various optimization algorithms to train neural networks)
+from torch.cuda import amp## import amp(automatic mixed precision) package that allows the use of mixed precision
+from torch.optim import lr_scheduler## import submodule that provides several methods to adjust the learning rate based on the number of epochs
+from torch.optim.swa_utils import AveragedModel## import AveragedModel class(computes weights of the SWA(Stochastic Weight Averaging) model)
+from torch.utils.data import DataLoader## import class that represents an iterable over a dataset
+from torch.utils.tensorboard import SummaryWriter## import class that provides a convenient way to log various kinds of data during model training and evaluation
 
-import config## undefined
-from dataset import CUDAPrefetcher, ImageDataset## undefined
-from utils import accuracy, load_state_dict, make_directory, save_checkpoint, Summary, AverageMeter, ProgressMeter## undefined
+import config## import config module
+from dataset import CUDAPrefetcher, ImageDataset## import two classes from dataset module
+from utils import accuracy, load_state_dict, make_directory, save_checkpoint, Summary, AverageMeter, ProgressMeter## import several functions from utils module
 import model
 
 model_names = sorted(

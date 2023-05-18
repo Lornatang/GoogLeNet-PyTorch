@@ -44,39 +44,39 @@ def accuracy(output, target, topk=(1,)):
         return results
 
 
-def load_state_dict(
-        model: nn.Module,
-        model_weights_path: str,
-        ema_model: nn.Module = None,
-        start_epoch: int = None,
-        best_acc1: float = None,
-        optimizer: torch.optim.Optimizer = None,
-        scheduler: torch.optim.lr_scheduler = None,
+def load_state_dict(## undefined
+        model: nn.Module,## undefined
+        model_weights_path: str,## undefined
+        ema_model: nn.Module = None,## undefined
+        start_epoch: int = None,## undefined
+        best_acc1: float = None,## undefined
+        optimizer: torch.optim.Optimizer = None,## undefined
+        scheduler: torch.optim.lr_scheduler = None,## undefined
         load_mode: str = None,
 ) -> [nn.Module, nn.Module, str, int, float, torch.optim.Optimizer, torch.optim.lr_scheduler]:
     # Load model weights
     checkpoint = torch.load(model_weights_path, map_location=lambda storage, loc: storage)
 
-    if load_mode == "resume":
+    if load_mode == "resume":## undefined
         # Restore the parameters in the training node to this point
-        start_epoch = checkpoint["epoch"]
-        best_acc1 = checkpoint["best_acc1"]
+        start_epoch = checkpoint["epoch"]## undefined
+        best_acc1 = checkpoint["best_acc1"]## undefined
         # Load model state dict. Extract the fitted model weights
-        model_state_dict = model.state_dict()
+        model_state_dict = model.state_dict()## undefined
         state_dict = {k: v for k, v in checkpoint["state_dict"].items() if k in model_state_dict.keys()}
         # Overwrite the model weights to the current model (base model)
-        model_state_dict.update(state_dict)
-        model.load_state_dict(model_state_dict)
+        model_state_dict.update(state_dict)## undefined
+        model.load_state_dict(model_state_dict)## undefined
         # Load ema model state dict. Extract the fitted model weights
-        ema_model_state_dict = ema_model.state_dict()
+        ema_model_state_dict = ema_model.state_dict()## undefined
         ema_state_dict = {k: v for k, v in checkpoint["ema_state_dict"].items() if k in ema_model_state_dict.keys()}
         # Overwrite the model weights to the current model (ema model)
-        ema_model_state_dict.update(ema_state_dict)
-        ema_model.load_state_dict(ema_model_state_dict)
+        ema_model_state_dict.update(ema_state_dict)## undefined
+        ema_model.load_state_dict(ema_model_state_dict)## undefined
         # Load the optimizer model
-        optimizer.load_state_dict(checkpoint["optimizer"])
+        optimizer.load_state_dict(checkpoint["optimizer"])## undefined
         # Load the scheduler model
-        scheduler.load_state_dict(checkpoint["scheduler"])
+        scheduler.load_state_dict(checkpoint["scheduler"])## undefined
     else:
         # Load model state dict. Extract the fitted model weights
         model_state_dict = model.state_dict()
@@ -102,7 +102,7 @@ def ovewrite_named_param(kwargs: Dict[str, Any], param: str, new_value: V) -> No
         kwargs[param] = new_value
 
 
-def save_checkpoint(
+def save_checkpoint(## undefined
         state_dict: dict,
         file_name: str,
         samples_dir: str,
@@ -114,49 +114,49 @@ def save_checkpoint(
     torch.save(state_dict, checkpoint_path)
 
     if is_best:
-        shutil.copyfile(checkpoint_path, os.path.join(results_dir, "best.pth.tar"))
+        shutil.copyfile(checkpoint_path, os.path.join(results_dir, "best.pth.tar"))## undefined
     if is_last:
         shutil.copyfile(checkpoint_path, os.path.join(results_dir, "last.pth.tar"))
 
 
-class Summary(Enum):
+class Summary(Enum):## undefined
     NONE = 0
     AVERAGE = 1
     SUM = 2
     COUNT = 3
 
 
-class AverageMeter(object):
-    def __init__(self, name, fmt=":f", summary_type=Summary.AVERAGE):
-        self.name = name
-        self.fmt = fmt
-        self.summary_type = summary_type
+class AverageMeter(object):## undefined
+    def __init__(self, name, fmt=":f", summary_type=Summary.AVERAGE):## undefined
+        self.name = name## undefined
+        self.fmt = fmt## undefined
+        self.summary_type = summary_type## undefined
         self.reset()
 
     def reset(self):
-        self.val = 0
-        self.avg = 0
-        self.sum = 0
-        self.count = 0
+        self.val = 0## undefined
+        self.avg = 0## undefined
+        self.sum = 0## undefined
+        self.count = 0## undefined
 
     def update(self, val, n=1):
-        self.val = val
-        self.sum += val * n
-        self.count += n
+        self.val = val## undefined
+        self.sum += val * n## undefined
+        self.count += n## undefined
         self.avg = self.sum / self.count
 
     def __str__(self):
-        fmtstr = "{name} {val" + self.fmt + "} ({avg" + self.fmt + "})"
+        fmtstr = "{name} {val" + self.fmt + "} ({avg" + self.fmt + "})"## undefined
         return fmtstr.format(**self.__dict__)
 
-    def summary(self):
-        if self.summary_type is Summary.NONE:
-            fmtstr = ""
-        elif self.summary_type is Summary.AVERAGE:
-            fmtstr = "{name} {avg:.2f}"
-        elif self.summary_type is Summary.SUM:
-            fmtstr = "{name} {sum:.2f}"
-        elif self.summary_type is Summary.COUNT:
+    def summary(self):## undefined
+        if self.summary_type is Summary.NONE:## undefined
+            fmtstr = ""## undefined
+        elif self.summary_type is Summary.AVERAGE:## undefined
+            fmtstr = "{name} {avg:.2f}"## undefined
+        elif self.summary_type is Summary.SUM:## undefined
+            fmtstr = "{name} {sum:.2f}"## undefined
+        elif self.summary_type is Summary.COUNT:## undefined
             fmtstr = "{name} {count:.2f}"
         else:
             raise ValueError(f"Invalid summary type {self.summary_type}")
